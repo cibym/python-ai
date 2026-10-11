@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Spring / Enterprise AI",
+    "channel_id": "UC_YOUR_SPRING_CHANNEL_ID",
+    "category": "tech"
+  },
+  {
+    "name": "Value & Quality Investing",
+    "channel_id": "UC_YOUR_VALUE_INVESTING_CHANNEL_ID",
+    "category": "investing"
+  }
+]
