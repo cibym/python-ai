@@ -1,12 +1,182 @@
 [
   {
-    "name": "Spring / Enterprise AI",
-    "channel_id": "UC_YOUR_SPRING_CHANNEL_ID",
-    "category": "tech"
+    "name": "Acquired",
+    "channel_id": "UCyFqFYfTW2VoIQKylJ04Rtw",
+    "category": "wealth_strategy"
   },
   {
-    "name": "Value & Quality Investing",
-    "channel_id": "UC_YOUR_VALUE_INVESTING_CHANNEL_ID",
-    "category": "investing"
+    "name": "All-In Podcast",
+    "channel_id": "UCESLZhusAkFfsNsApnjF_Cg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Business Breakdowns",
+    "channel_id": "UCfnHKTFEryHWyqr4Xjsjb3w",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "BWB - Business With Brian",
+    "channel_id": "UCyqlbzLoYtpqDXwRI9Yh5LA",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Founders Podcast",
+    "channel_id": "UCQ-rrUCsJLNjFdPtKq0YOfA",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Nikhil Kamath",
+    "channel_id": "UCnC8SAZzQiBGYVSKZ_S3y4Q",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Sequoia Capital",
+    "channel_id": "UCWrF0oN6unbXrWsTN7RctTw",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Y Combinator",
+    "channel_id": "UCcefcZRL2oaA_uBNeo5UOWg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "ARK Invest",
+    "channel_id": "UCK-zlnUfoDHzUwXcbddtnkg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Asymmetric Investing by Travis Hoium",
+    "channel_id": "UCM2udYo4m-_uQfbfLGwf6mA",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "FINAiUS",
+    "channel_id": "UCGBoWe1mzCvbbqDNncmxm8A",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Hamish Hodder",
+    "channel_id": "UCODr9HUJ90xtWD-0Xoz4vPw",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Joseph Carlson After Hours",
+    "channel_id": "UCfCT7SSFEWyG4th9ZmaGYqQ",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Mark Roussin, CPA",
+    "channel_id": "UCC7xhD0o7FBHdKXZxMRFspQ",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "The Swedish Investor",
+    "channel_id": "UCAeAB8ABXGoGMbXuYPmiu2A",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Zacks Investment Research",
+    "channel_id": "UChLnhKjHRlCl4DSncwJ1D_A",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Invest Like The Best",
+    "channel_id": "UCpQBb0fToph3jrDulwz1iUQ",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Morningstar, Inc.",
+    "channel_id": "UChub1tZZuWn9YYHJZZYTbMg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Optimized Portfolio",
+    "channel_id": "UCi94-49DlEEqlC3-VbuWsPw",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "The Motley Fool",
+    "channel_id": "UCpRQuynBX9Qy9tPrcswpPag",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Ticker Symbol: YOU",
+    "channel_id": "UC7kCeZ53sli_9XwuQeFxLqw",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "WallStreetZen",
+    "channel_id": "UCMddKmLQYkPPmY5q6qckrMg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Adriconomics",
+    "channel_id": "UCZuV88AJv5nDZDcY1UNGldQ",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Economics Explained",
+    "channel_id": "UCZ4AMrDcNrfy3X6nsU8-rPg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Investing Simplified - Professor G",
+    "channel_id": "UCr4XXQznhlgfzo4mwOgkF8w",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Let's Talk Money! with Joseph Hogue, CFA",
+    "channel_id": "UCbKdotYtcY9SxoU8CYAXdvg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Money Rehab with Nicole Lapin",
+    "channel_id": "UC0KGoa1csmIeAAQIigSwMSw",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "The Plain Bagel",
+    "channel_id": "UCFCEuCsyWP0YkP3CZ3Mr01Q",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Bloomberg Originals",
+    "channel_id": "UCUMZ7gohGI9HcU9VNsr2FJQ",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Bloomberg Tech",
+    "channel_id": "UCrM7B7SL_g1edFOnmj-SDKg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Bloomberg Television",
+    "channel_id": "UCIALMKvObZNtJ6AmdCLP7Lg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "David Rubenstein",
+    "channel_id": "UCqsN9MYiu1mKSAsYoF6ppTg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Marius Finans",
+    "channel_id": "UCqFxJA82Kpt7clejsQ47gKA",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Nordnet Norge",
+    "channel_id": "UCHuzYEZn73lB5tI7nFcIusg",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Norges Bank Investment Management",
+    "channel_id": "UCRhQsN8AVIfZuBNeRV1A37w",
+    "category": "wealth_strategy"
+  },
+  {
+    "name": "Yahoo Finance",
+    "channel_id": "UCEAZeUIeJs0IjQiqTCdVSIg",
+    "category": "wealth_strategy"
   }
 ]
