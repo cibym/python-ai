@@ -39,29 +39,54 @@ def load_config():
                 portfolio_items.append(f"{row['ticker']} ({row['name']})")
 
     return channels, ", ".join(portfolio_items)
-
+    
 def fetch_youtube_transcripts(channels):
     extracted = []
     for ch in channels:
         feed_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={ch['channel_id']}"
         feed = feedparser.parse(feed_url)
-        for entry in feed.entries[:2]:  # Check top 2 recent videos per channel
+        
+        channel_videos_found = 0
+        # Inspect up to 5 recent uploads to find at least 2 with usable transcripts
+        for entry in feed.entries[:5]:
+            if channel_videos_found >= 2:
+                break
+                
             video_id = entry.get("yt_videoid")
             if not video_id:
                 continue
+
             try:
-                chunks = YouTubeTranscriptApi.get_transcript(video_id)
-                full_text = " ".join([c["text"] for c in chunks])
-                extracted.append({
-                    "channel": ch["name"],
-                    "category": ch["category"],
-                    "title": entry.title,
-                    "link": entry.link,
-                    "transcript": full_text[:12000]  # Fit concise context
-                })
-            except Exception:
-                # Video has no closed captions or disabled transcripts
+                # 1. Fetch available transcript list for the video
+                transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+                
+                # 2. Try manual/generated English first, then fallback to auto-translation
+                try:
+                    transcript_obj = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
+                except Exception:
+                    # If only non-English is available, translate it to English
+                    transcript_obj = transcript_list.find_transcript(['no', 'de', 'es', 'fr']).translate('en')
+
+                chunks = transcript_obj.fetch()
+                full_text = " ".join([c["text"] for c in chunks if c.get("text")])
+
+                if len(full_text.strip()) > 100:  # Ensure it actually has meaningful content
+                    extracted.append({
+                        "channel": ch["name"],
+                        "category": ch.get("category", "General"),
+                        "title": entry.title,
+                        "link": entry.link,
+                        "transcript": full_text[:12000]
+                    })
+                    channel_videos_found += 1
+                    print(f"✓ Extracted transcript: [{ch['name']}] {entry.title[:40]}...")
+
+            except Exception as e:
+                # Log the reason for debugging instead of silent skipping
+                print(f"✗ Skipped video {video_id} ({entry.title[:30]}): {e}")
                 continue
+
+    print(f"\nTotal video transcripts successfully passed to Gemini: {len(extracted)}")
     return extracted
 
 def fetch_dataroma_moves():
