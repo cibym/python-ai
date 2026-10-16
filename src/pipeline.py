@@ -12,6 +12,8 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ServerError, ClientError
 
+
+
 # 1. Environment Secrets
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
 RESEND_KEY = os.environ.get("RESEND_API_KEY")
@@ -80,16 +82,21 @@ def fetch_dataroma_moves():
     except Exception as e:
         return f"Dataroma scrape bypassed: {e}"
 
+
 def generate_with_fallback(prompt, system_instruction):
     """
-    Attempts to generate content with exponential backoff on 503 high-demand errors,
-    and falls back through candidate models if persistent issues occur.
+    Attempts to generate content with exponential backoff on 503 errors,
+    and cycles through valid active models.
     """
-    candidate_models = ["gemini-3.8-flash", "gemini-2.5-pro"]
+    candidate_models = [
+        "gemini-3.8-flash",
+        "gemini-3-flash",
+        "gemini-3-pro"
+    ]
     config = types.GenerateContentConfig(system_instruction=system_instruction)
 
     for model_name in candidate_models:
-        for attempt in range(3):
+        for attempt in range(4):
             try:
                 print(f"Generating brief using {model_name} (attempt {attempt + 1})...")
                 response = client.models.generate_content(
@@ -99,17 +106,17 @@ def generate_with_fallback(prompt, system_instruction):
                 )
                 return response
             except ServerError as e:
-                wait_time = (attempt + 1) * 8
+                wait_time = (attempt + 1) * 12
                 print(f"Server demand spike (503) on {model_name}. Retrying in {wait_time}s...")
                 time.sleep(wait_time)
             except ClientError as e:
-                print(f"ClientError on {model_name} ({e.code}). Switching models...")
+                print(f"ClientError on {model_name} (status {getattr(e, 'code', 'unknown')}): skipping to next model...")
                 break
             except Exception as e:
-                print(f"Unexpected error with {model_name}: {e}. Retrying in 5s...")
-                time.sleep(5)
+                print(f"Unexpected error with {model_name}: {e}. Retrying in 8s...")
+                time.sleep(8)
 
-    raise RuntimeError("All Gemini model attempts failed due to service saturation.")
+    raise RuntimeError("All configured Gemini models failed. Check active models in Google AI Studio.")
 
 def run_analysis_and_send():
     channels, portfolio_str = load_config()
