@@ -68,8 +68,8 @@ def fetch_youtube_transcripts(channels):
                     })
                     channel_videos_found += 1
                     print(f"✓ Extracted: [{ch.get('name')}] {entry.title[:45]}")
-            except Exception as e:
-                # Continue gracefully if no captions exist in targeted languages
+           except Exception as e:
+                print(f"Could not load transcript for {video_id} ({entry.title[:30]}): {e}")
                 continue
 
     print(f"\nTotal video transcripts passed to Gemini: {len(extracted)}")
@@ -95,13 +95,13 @@ def fetch_dataroma_moves():
 
 def generate_with_fallback(prompt, system_instruction):
     """
-    Cycles through valid model names with exponential backoff on 503 high-demand errors.
+    Cycles through active generation models with exponential backoff on transient 503 errors.
     """
     candidate_models = [
-        "gemini-2.5-flash",
-        "gemini-2.5-pro",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro"
+        "gemini-3.8-flash",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-4-argon"
     ]
     config = types.GenerateContentConfig(system_instruction=system_instruction)
 
@@ -116,18 +116,19 @@ def generate_with_fallback(prompt, system_instruction):
                 )
                 return response
             except ServerError as e:
-                wait_time = (attempt + 1) * 10
-                print(f"Server demand spike (503) on {model_name}. Retrying in {wait_time}s...")
+                wait_time = (attempt + 1) * 6
+                print(f"503 load spike on {model_name}. Retrying in {wait_time}s...")
                 time.sleep(wait_time)
             except ClientError as e:
-                print(f"ClientError on {model_name} (status {getattr(e, 'code', 'unknown')}). Skipping model...")
+                # If a model is unavailable or permissions are restricted, jump straight to the next one
+                print(f"Skipping {model_name} (status {getattr(e, 'code', 'unknown')})...")
                 break
             except Exception as e:
-                print(f"Error on {model_name}: {e}. Retrying in 5s...")
+                print(f"Unexpected error with {model_name}: {e}. Retrying in 5s...")
                 time.sleep(5)
 
-    raise RuntimeError("All configured Gemini models failed. Verify API key and model access in AI Studio.")
-
+    raise RuntimeError("All configured Gemini models failed. Verify your GEMINI_API_KEY has access in Google AI Studio.")
+    
 def run_analysis_and_send():
     channels, portfolio_str = load_config()
     yt_data = fetch_youtube_transcripts(channels)
