@@ -1,35 +1,20 @@
-import feedparser
-from youtube_transcript_api import YouTubeTranscriptApi
+import requests
+from bs4 import BeautifulSoup
 
-TARGET_LANGUAGES = ['en', 'en-US', 'en-GB', 'no', 'nb', 'nn', 'de', 'es', 'fr']
-
-def fetch_youtube_transcripts(channels: list, max_videos_per_channel: int = 2) -> list:
-    extracted = []
-    for ch in channels:
-        channel_id = ch.get("channel_id")
-        if not channel_id:
-            continue
-
-        feed_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
-        feed = feedparser.parse(feed_url)
-        videos_found = 0
-
-        for entry in feed.entries[:6]:
-            if videos_found >= max_videos_per_channel:
-                break
-            video_id = entry.get("yt_videoid")
-            if not video_id:
-                continue
-            try:
-                chunks = YouTubeTranscriptApi.get_transcript(video_id, languages=TARGET_LANGUAGES)
-                full_text = " ".join([c["text"] for c in chunks if "text" in c])
-                if len(full_text.strip()) > 100:
-                    extracted.append({
-                        "channel": ch.get("name", "Unknown"),
-                        "title": getattr(entry, "title", "Untitled"),
-                        "transcript": full_text[:12000]
-                    })
-                    videos_found += 1
-            except Exception:
-                continue
-    return extracted
+def fetch_dataroma_moves(limit: int = 12) -> str:
+    url = "https://www.dataroma.com/m/allact.php?typ=a"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    try:
+        resp = requests.get(url, headers=headers, timeout=10)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+        table = soup.find("table", {"id": "grid"})
+        rows = []
+        if table:
+            for tr in table.find_all("tr")[1:limit]:
+                cols = [td.get_text(strip=True) for td in tr.find_all("td")]
+                if len(cols) >= 4:
+                    rows.append(f"{cols[0]} | Stock: {cols[1]} | Action: {cols[2]} | Shares/Pct: {cols[3]}")
+        return "\n".join(rows) if rows else "No recent 13F activity."
+    except Exception as e:
+        return f"Dataroma scrape bypassed: {e}"
