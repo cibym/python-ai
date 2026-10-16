@@ -1,5 +1,62 @@
-ticker,name,asset_type,currency
-VWCE,Vanguard FTSE All-World UCITS ETF,ETF,EUR
-ASML,ASML Holding NV,Stock,EUR
-TSM,Taiwan Semiconductor,Stock,USD
-EQNR,Equinor ASA,Stock,NOK
+| ticker | name | asset_type | currency |
+| --- | --- | --- | --- |
+| **XAIX** | Xtrackers Artificial Intelligence & Big Data UCITS ETF | ETF | EUR
+
+ |
+| **AVGO** | Broadcom Inc. | Stock | USD
+
+ |
+| **AIFS** | iShares AI Infrastructure UCITS ETF USD (Acc) | ETF | EUR
+
+ |
+| **SMGB** | VanEck Semiconductor UCITS ETF | ETF | EUR
+
+ |
+| **CURE** | VanEck Genomics and Healthcare Innovators UCITS ETF | ETF | EUR
+
+ |
+| **SAP** | SAP SE | Stock | EUR
+
+ |
+| **2B76** | iShares Automation & Robotics UCITS ETF USD (Acc) | ETF | EUR
+
+ |
+| **NVDA** | NVIDIA Corporation | Stock | USD
+
+ |
+| **MSFT** | Microsoft Corporation | Stock | USD
+
+ |
+| **LOCK** | iShares Digital Security UCITS ETF USD (Acc) | ETF | EUR
+
+ |
+| **GOOGL** | Alphabet Inc. Class A | Stock | USD
+
+ |
+| **NUKL** | VanEck Uranium and Nuclear Technologies UCITS ETF | ETF | EUR
+
+ |
+| **COLO-B** | Coloplast B | Stock | DKK
+
+ |
+| **WTEF** | iShares AI Innovation Active UCITS ETF USD (Acc) | ETF | EUR
+
+ |
+| **NKE** | Nike Inc. | Stock | USD
+
+ |
+| **VUSA** | Vanguard S&P 500 UCITS ETF | ETF | EUR
+
+ |
+| **DOCT** | L&G Healthcare Breakthrough UCITS ETF | ETF | EUR
+
+ |
+| **2B78** | iShares Healthcare Innovation UCITS ETF USD (Acc) | ETF | EUR
+
+ |
+| **PLTR** | Palantir Technologies Inc. | Stock | USD
+
+ |
+| **BBAI** | BigBear.ai Holdings Inc. | Stock | USD
+
+ |
