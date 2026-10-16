@@ -12,8 +12,6 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ServerError, ClientError
 
-
-
 # 1. Environment Secrets
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
 RESEND_KEY = os.environ.get("RESEND_API_KEY")
@@ -26,11 +24,9 @@ client = genai.Client(api_key=GEMINI_KEY)
 resend.api_key = RESEND_KEY
 
 def load_config():
-    # Load channels
     with open("config/channels.json", "r") as f:
         channels = json.load(f)
 
-    # Load portfolio
     portfolio_items = []
     if os.path.exists("config/portfolio.csv"):
         with open("config/portfolio.csv", "r") as f:
@@ -39,16 +35,17 @@ def load_config():
                 portfolio_items.append(f"{row['ticker']} ({row['name']})")
 
     return channels, ", ".join(portfolio_items)
-    
+
 def fetch_youtube_transcripts(channels):
     extracted = []
+    target_languages = ['en', 'en-US', 'en-GB', 'no', 'nb', 'nn', 'de', 'es', 'fr']
+    
     for ch in channels:
         feed_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={ch['channel_id']}"
         feed = feedparser.parse(feed_url)
         
         channel_videos_found = 0
-        # Inspect up to 5 recent uploads to find at least 2 with usable transcripts
-        for entry in feed.entries[:5]:
+        for entry in feed.entries[:6]:
             if channel_videos_found >= 2:
                 break
                 
@@ -57,36 +54,25 @@ def fetch_youtube_transcripts(channels):
                 continue
 
             try:
-                # 1. Fetch available transcript list for the video
-                transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-                
-                # 2. Try manual/generated English first, then fallback to auto-translation
-                try:
-                    transcript_obj = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
-                except Exception:
-                    # If only non-English is available, translate it to English
-                    transcript_obj = transcript_list.find_transcript(['no', 'de', 'es', 'fr']).translate('en')
+                # get_transcript supports specifying language priority
+                chunks = YouTubeTranscriptApi.get_transcript(video_id, languages=target_languages)
+                full_text = " ".join([c["text"] for c in chunks if "text" in c])
 
-                chunks = transcript_obj.fetch()
-                full_text = " ".join([c["text"] for c in chunks if c.get("text")])
-
-                if len(full_text.strip()) > 100:  # Ensure it actually has meaningful content
+                if len(full_text.strip()) > 100:
                     extracted.append({
-                        "channel": ch["name"],
+                        "channel": ch.get("name", "Unknown Channel"),
                         "category": ch.get("category", "General"),
                         "title": entry.title,
                         "link": entry.link,
                         "transcript": full_text[:12000]
                     })
                     channel_videos_found += 1
-                    print(f"✓ Extracted transcript: [{ch['name']}] {entry.title[:40]}...")
-
+                    print(f"✓ Extracted: [{ch.get('name')}] {entry.title[:45]}")
             except Exception as e:
-                # Log the reason for debugging instead of silent skipping
-                print(f"✗ Skipped video {video_id} ({entry.title[:30]}): {e}")
+                # Continue gracefully if no captions exist in targeted languages
                 continue
 
-    print(f"\nTotal video transcripts successfully passed to Gemini: {len(extracted)}")
+    print(f"\nTotal video transcripts passed to Gemini: {len(extracted)}")
     return extracted
 
 def fetch_dataroma_moves():
@@ -107,21 +93,20 @@ def fetch_dataroma_moves():
     except Exception as e:
         return f"Dataroma scrape bypassed: {e}"
 
-
 def generate_with_fallback(prompt, system_instruction):
     """
-    Attempts to generate content with exponential backoff on 503 errors,
-    and cycles through valid active models.
+    Cycles through valid model names with exponential backoff on 503 high-demand errors.
     """
     candidate_models = [
-        "gemini-3.8-flash",
-        "gemini-3-flash",
-        "gemini-3-pro"
+        "gemini-2.5-flash",
+        "gemini-2.5-pro",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro"
     ]
     config = types.GenerateContentConfig(system_instruction=system_instruction)
 
     for model_name in candidate_models:
-        for attempt in range(4):
+        for attempt in range(3):
             try:
                 print(f"Generating brief using {model_name} (attempt {attempt + 1})...")
                 response = client.models.generate_content(
@@ -131,17 +116,17 @@ def generate_with_fallback(prompt, system_instruction):
                 )
                 return response
             except ServerError as e:
-                wait_time = (attempt + 1) * 12
+                wait_time = (attempt + 1) * 10
                 print(f"Server demand spike (503) on {model_name}. Retrying in {wait_time}s...")
                 time.sleep(wait_time)
             except ClientError as e:
-                print(f"ClientError on {model_name} (status {getattr(e, 'code', 'unknown')}): skipping to next model...")
+                print(f"ClientError on {model_name} (status {getattr(e, 'code', 'unknown')}). Skipping model...")
                 break
             except Exception as e:
-                print(f"Unexpected error with {model_name}: {e}. Retrying in 8s...")
-                time.sleep(8)
+                print(f"Error on {model_name}: {e}. Retrying in 5s...")
+                time.sleep(5)
 
-    raise RuntimeError("All configured Gemini models failed. Check active models in Google AI Studio.")
+    raise RuntimeError("All configured Gemini models failed. Verify API key and model access in AI Studio.")
 
 def run_analysis_and_send():
     channels, portfolio_str = load_config()
@@ -208,7 +193,7 @@ def run_analysis_and_send():
     """
 
     resend.Emails.send({
-        "from": "onboarding@resend.dev",  # Resend's free default sandbox domain
+        "from": "onboarding@resend.dev",
         "to": RECIPIENT_EMAIL,
         "subject": "☕ Daily Market & Tech Pulse",
         "html": styled_email
