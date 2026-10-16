@@ -1,6 +1,7 @@
 import os
 import json
 import csv
+import time
 import requests
 import feedparser
 import markdown
@@ -9,6 +10,7 @@ from bs4 import BeautifulSoup
 from youtube_transcript_api import YouTubeTranscriptApi
 from google import genai
 from google.genai import types
+from google.genai.errors import ServerError, ClientError
 
 # 1. Environment Secrets
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
@@ -53,7 +55,7 @@ def fetch_youtube_transcripts(channels):
                     "category": ch["category"],
                     "title": entry.title,
                     "link": entry.link,
-                    "transcript": full_text[:12000] # Fit concise context
+                    "transcript": full_text[:12000]  # Fit concise context
                 })
             except Exception:
                 # Video has no closed captions or disabled transcripts
@@ -77,6 +79,37 @@ def fetch_dataroma_moves():
         return "\n".join(rows)
     except Exception as e:
         return f"Dataroma scrape bypassed: {e}"
+
+def generate_with_fallback(prompt, system_instruction):
+    """
+    Attempts to generate content with exponential backoff on 503 high-demand errors,
+    and falls back through candidate models if persistent issues occur.
+    """
+    candidate_models = ["gemini-3.8-flash", "gemini-2.5-pro"]
+    config = types.GenerateContentConfig(system_instruction=system_instruction)
+
+    for model_name in candidate_models:
+        for attempt in range(3):
+            try:
+                print(f"Generating brief using {model_name} (attempt {attempt + 1})...")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=config
+                )
+                return response
+            except ServerError as e:
+                wait_time = (attempt + 1) * 8
+                print(f"Server demand spike (503) on {model_name}. Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            except ClientError as e:
+                print(f"ClientError on {model_name} ({e.code}). Switching models...")
+                break
+            except Exception as e:
+                print(f"Unexpected error with {model_name}: {e}. Retrying in 5s...")
+                time.sleep(5)
+
+    raise RuntimeError("All Gemini model attempts failed due to service saturation.")
 
 def run_analysis_and_send():
     channels, portfolio_str = load_config()
@@ -110,11 +143,7 @@ def run_analysis_and_send():
        - Name at most 1–2 candidates possessing Wide/Narrow moats worth manually checking on Morningstar for a Price/Fair Value discount. If none qualify, write `None today — stick to core ETF contributions.`
     """
 
-    response = client.models.generate_content(
-        model='gemini-3.8-flash',
-        contents=prompt,
-        config=types.GenerateContentConfig(system_instruction=system_instruction)
-    )
+    response = generate_with_fallback(prompt, system_instruction)
 
     # Convert Markdown to HTML
     html_content = markdown.markdown(response.text, extensions=['tables'])
